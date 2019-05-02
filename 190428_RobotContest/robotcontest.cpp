@@ -86,16 +86,6 @@ void RobotContest::on_lastOne_PushButton_clicked()
 	secondScore_LineEdit->setText(manageExcel.readCellValue(currentRow, 4));
 	finalScore_LineEdit->setText(manageExcel.readCellValue(currentRow, 5));
 	facadeScore_LineEdit->setText(manageExcel.readCellValue(currentRow, 6));
-
-	teamNum1_LineEdit->setText(manageExcel.readCellValue(currentRow, 1));
-	teamName1_LineEdit->setText(manageExcel.readCellValue(currentRow, 2));
-	bend_LineEdit->setText(manageExcel.readCellValue(currentRow, 8));
-	obstacle_LineEdit->setText(manageExcel.readCellValue(currentRow, 9));
-	impact_LineEdit->setText(manageExcel.readCellValue(currentRow, 10));
-	interference_LineEdit->setText(manageExcel.readCellValue(currentRow, 11));
-	isStop_LineEdit->setText(manageExcel.readCellValue(currentRow, 2));
-	isSlide_LineEdit->setText(manageExcel.readCellValue(currentRow, 2));
-
 }
 
 void RobotContest::on_nextOne_PushButton_clicked()
@@ -286,6 +276,88 @@ void RobotContest::on_teamName_LineEdit_textChanged()
 	}
 }
 
+void RobotContest::on_saveTimer_timeout()
+{
+	manageExcel.saveExcel();
+}
+
+void RobotContest::on_writeDeductTime_PushButton_clicked()
+{
+	teamNum1_LineEdit->setText(manageExcel.readCellValue(currentRow, 1));
+	teamName1_LineEdit->setText(manageExcel.readCellValue(currentRow, 2));
+	bend_LineEdit->setText(manageExcel.readCellValue(currentRow, 8));
+	obstacle_LineEdit->setText(manageExcel.readCellValue(currentRow, 9));
+	impact_LineEdit->setText(manageExcel.readCellValue(currentRow, 10));
+	interference_LineEdit->setText(manageExcel.readCellValue(currentRow, 11));
+	if (manageExcel.readCellValue(currentRow, 12) == "0") {
+		isStop_ComboBox->setCurrentIndex(1);
+	}
+	if (manageExcel.readCellValue(currentRow, 13) == "1") {
+		isSlide_ComboBox->setCurrentIndex(1);
+	}
+	totalDeductMarks_LineEdit->setText(manageExcel.readCellValue(currentRow, 14));
+	finalTime_LineEdit->setText(manageExcel.readCellValue(currentRow, 15));
+	if (manageExcel.readCellValue(currentRow, 11) == "1") {
+		remake_ComboBox->setCurrentIndex(1);
+	}
+	//isStop_LineEdit->setText(manageExcel.readCellValue(currentRow, 12));
+	//isSlide_LineEdit->setText(manageExcel.readCellValue(currentRow, 13));
+
+	deductMark_Widget->show();
+}
+
+void RobotContest::on_calculate_PushButton_clicked()
+{
+	int bendsConuts = 0, obstaclesCounts = 0, impactsCount = 0, interferencesCount = 0;
+	int isStop = 1, isSlide = 0;
+	int totalDeductMarks;
+	float facadeScore = 0.0, betterScore = 0.0;
+	float finalTime;
+
+	if (!bend_LineEdit->text().isEmpty()) {
+		bendsConuts = bend_LineEdit->text().toInt();
+	}
+	if (!obstacle_LineEdit->text().isEmpty()) {
+		obstaclesCounts = obstacle_LineEdit->text().toInt();
+	}
+	if (!interference_LineEdit->text().isEmpty()) {
+		interferencesCount = interference_LineEdit->text().toInt();
+	}
+	if (!impact_LineEdit->text().isEmpty()) {
+		impactsCount = impact_LineEdit->text().toInt();
+	}
+	isStop = isStop_ComboBox->currentIndex();
+	isSlide = isSlide_ComboBox->currentIndex();
+	totalDeductMarks = 5 * bendsConuts + 10 * obstaclesCounts + 5 * impactsCount + 5 * interferencesCount +
+		5 * isStop + 10 * isSlide;
+	totalDeductMarks_LineEdit->setText(tr("%1").arg(totalDeductMarks));
+
+	if (!manageExcel.readCellValue(currentRow, 7).isEmpty()) {
+		facadeScore = manageExcel.readCellValue(currentRow, 7).toFloat();
+	}
+	if (!manageExcel.readCellValue(currentRow, 5).isEmpty()) {
+		betterScore = float(timeStringToInt(manageExcel.readCellValue(currentRow, 5))) / 1000;
+	}
+	
+	finalTime = betterScore - facadeScore + totalDeductMarks;
+	finalTime_LineEdit->setText(tr("%1").arg(finalTime));
+}
+
+void RobotContest::on_quitWidget_PushButton_clicked()
+{
+
+	manageExcel.writeCellValue(currentRow, 8, bend_LineEdit->text());
+	manageExcel.writeCellValue(currentRow, 9, obstacle_LineEdit->text());
+	manageExcel.writeCellValue(currentRow, 10, impact_LineEdit->text());
+	manageExcel.writeCellValue(currentRow, 11, interference_LineEdit->text());
+	manageExcel.writeCellValue(currentRow, 12, tr("%1").arg(isStop_ComboBox->currentIndex()));
+	manageExcel.writeCellValue(currentRow, 13, tr("%1").arg(isSlide_ComboBox->currentIndex()));
+	manageExcel.writeCellValue(currentRow, 14, totalDeductMarks_LineEdit->text());
+	manageExcel.writeCellValue(currentRow, 15, finalTime_LineEdit->text());
+	manageExcel.writeCellValue(currentRow, 16, tr("%1").arg(remake_ComboBox->currentIndex()));
+
+}
+
 void RobotContest::designUI()
 {
 	setWindowTitle(tr("武汉科技大学 第五届机器人大赛"));
@@ -317,6 +389,8 @@ void RobotContest::designUI()
 	openExcel_PushButton->setStatusTip(tr("加载比赛的Excel文件"));
 	newExcel_PushButton = new QPushButton(tr("新建Excel"), this);
 	newExcel_PushButton->setStatusTip(tr("新建一个Excel文件"));
+	writeDeductTime_PushButton = new QPushButton(tr("录入加罚成绩"), this);
+	//writeDeductTime_PushButton->setEnabled(false);
 
 	//tipsForteam_TextBrowser = new QTextBrowser(this);
 	//tipsForteam_TextBrowser->setEnabled(false);
@@ -394,26 +468,27 @@ void RobotContest::designUI()
 	main_GridLayout->addWidget(openSerialPort_PushButton,3,1,1,1);
 	main_GridLayout->addWidget(openExcel_PushButton,4,0,1,1);
 	main_GridLayout->addWidget(newExcel_PushButton,4,1,1,1);
+	main_GridLayout->addWidget(writeDeductTime_PushButton,5,0,1,1);
 	//main_GridLayout->addWidget(tipsForteam_TextBrowser,2,2,3,4);
-	main_GridLayout->addWidget(tipsForTeams_Label, 2, 2, 3, 4);
-	main_GridLayout->addWidget(teamNum_Label,5,0,1,1);
-	main_GridLayout->addWidget(teamNum_LineEdit,6,0,1,1);
-	main_GridLayout->addWidget(teamName_Label,5,1,1,1);
-	main_GridLayout->addWidget(teamName_LineEdit,6,1,1,1);
-	main_GridLayout->addWidget(firstScore_Label,5,2,1,1);
-	main_GridLayout->addWidget(firstScore_LineEdit,6,2,1,1);
-	main_GridLayout->addWidget(secondScore_Label,5,3,1,1);
-	main_GridLayout->addWidget(secondScore_LineEdit,6,3,1,1);
-	main_GridLayout->addWidget(finalScore_Label,5,4,1,1);
-	main_GridLayout->addWidget(finalScore_LineEdit,6,4,1,1);
-	main_GridLayout->addWidget(facadeScore_Label,5,5,1,1);
-	main_GridLayout->addWidget(facadeScore_LineEdit,6,5,1,1);
-	main_GridLayout->addWidget(lastOne_PushButton,7,0,1,1);
-	main_GridLayout->addWidget(nextOne_PushButton,7,1,1,1);
-	main_GridLayout->addWidget(verifyScore_PushButton,7,2,1,1);
-	main_GridLayout->addWidget(startTime_PushButton,7,3,1,1);
-	main_GridLayout->addWidget(clearScore_PushButton,7,4,1,1);
-	main_GridLayout->addWidget(quit_PushButton,7,5,1,1);
+	main_GridLayout->addWidget(tipsForTeams_Label,2,2,4,4);
+	main_GridLayout->addWidget(teamNum_Label,6,0,1,1);
+	main_GridLayout->addWidget(teamNum_LineEdit,7,0,1,1);
+	main_GridLayout->addWidget(teamName_Label,6,1,1,1);
+	main_GridLayout->addWidget(teamName_LineEdit,7,1,1,1);
+	main_GridLayout->addWidget(firstScore_Label,6,2,1,1);
+	main_GridLayout->addWidget(firstScore_LineEdit,7,2,1,1);
+	main_GridLayout->addWidget(secondScore_Label,6,3,1,1);
+	main_GridLayout->addWidget(secondScore_LineEdit,7,3,1,1);
+	main_GridLayout->addWidget(finalScore_Label,6,4,1,1);
+	main_GridLayout->addWidget(finalScore_LineEdit,7,4,1,1);
+	main_GridLayout->addWidget(facadeScore_Label,6,5,1,1);
+	main_GridLayout->addWidget(facadeScore_LineEdit,7,5,1,1);
+	main_GridLayout->addWidget(lastOne_PushButton,8,0,1,1);
+	main_GridLayout->addWidget(nextOne_PushButton,8,1,1,1);
+	main_GridLayout->addWidget(verifyScore_PushButton,8,2,1,1);
+	main_GridLayout->addWidget(startTime_PushButton,8,3,1,1);
+	main_GridLayout->addWidget(clearScore_PushButton,8,4,1,1);
+	main_GridLayout->addWidget(quit_PushButton,8,5,1,1);
 }
 
 void RobotContest::createDeductMarkWidget()
@@ -440,14 +515,38 @@ void RobotContest::createDeductMarkWidget()
 	interference_Label = new QLabel(tr("人员干涉次数"), this);
 	interference_Label->setAlignment(Qt::AlignCenter);
 	interference_LineEdit = new QLineEdit(this);
+
 	isStop_Label = new QLabel(tr("是否自动停下"), this);
 	isStop_Label->setAlignment(Qt::AlignCenter);
-	isStop_LineEdit = new QLineEdit(this);
+	isStop_ComboBox = new QComboBox(this);
+	isStop_ComboBox->addItem(tr("是"),0);
+	isStop_ComboBox->addItem(tr("否"), 1);
+	//isStop_LineEdit = new QLineEdit(this);
 	isSlide_Label = new QLabel(tr("是否下滑"), this);
 	isSlide_Label->setAlignment(Qt::AlignCenter);
-	isSlide_LineEdit = new QLineEdit(this);
+	isSlide_ComboBox = new QComboBox(this);
+	isSlide_ComboBox->addItem(tr("否"));
+	isSlide_ComboBox->addItem(tr("是"));
 
+	calculate_PushButton = new QPushButton(tr("计算"), this);
 	quitWidget_PushButton = new QPushButton(tr("退出并保存录入"), this);
+	totalDeductMarks_Label = new QLabel(tr("加罚总时间"), this);
+	totalDeductMarks_Label->setAlignment(Qt::AlignCenter);
+	totalDeductMarks_LineEdit = new QLineEdit(this);
+	totalDeductMarks_LineEdit->setEnabled(false);
+	finalTime_Label = new QLabel(tr("最终成绩"), this);
+	finalTime_Label->setAlignment(Qt::AlignCenter);
+	finalTime_LineEdit = new QLineEdit(this);
+	finalTime_LineEdit->setEnabled(false);
+	remake_Label = new QLabel(tr("特殊情况"), this);
+	remake_Label->setAlignment(Qt::AlignCenter);
+	remake_ComboBox = new QComboBox(this);
+	remake_ComboBox->addItem(tr("否"));
+	remake_ComboBox->addItem(tr("是"));
+
+	//isSlide_LineEdit = new QLineEdit(this);
+
+	
 
 	deductMark_Widget = new QWidget();
 	deductMark_Widget->setFont(QFont(tr("楷体"), 12));
@@ -466,12 +565,23 @@ void RobotContest::createDeductMarkWidget()
 	deductMark_GridLayout->addWidget(impact_LineEdit,4,1,1,1);
 	deductMark_GridLayout->addWidget(interference_Label,5,0,1,1);
 	deductMark_GridLayout->addWidget(interference_LineEdit,5,1,1,1);
+
 	deductMark_GridLayout->addWidget(isStop_Label,6,0,1,1);
-	deductMark_GridLayout->addWidget(isStop_LineEdit,6,1,1,1);
+	deductMark_GridLayout->addWidget(isStop_ComboBox,6,1,1,1);
+	//deductMark_GridLayout->addWidget(isStop_LineEdit,6,1,1,1);
 	deductMark_GridLayout->addWidget(isSlide_Label,7,0,1,1);
-	deductMark_GridLayout->addWidget(isSlide_LineEdit,7,1,1,1);
+	//deductMark_GridLayout->addWidget(isSlide_LineEdit,7,1,1,1);
+	deductMark_GridLayout->addWidget(isSlide_ComboBox,7,1,1,1);
+
+	deductMark_GridLayout->addWidget(calculate_PushButton,8,0,1,1);
 	deductMark_GridLayout->addWidget(quitWidget_PushButton,8,1,1,1);
-	deductMark_Widget->show();
+	deductMark_GridLayout->addWidget(totalDeductMarks_Label,9,0,1,1);
+	deductMark_GridLayout->addWidget(totalDeductMarks_LineEdit,10,0,1,1);
+	deductMark_GridLayout->addWidget(finalTime_Label,9,1,1,1);
+	deductMark_GridLayout->addWidget(finalTime_LineEdit,10,1,1,1);
+	deductMark_GridLayout->addWidget(remake_Label,11,0,1,1);
+	deductMark_GridLayout->addWidget(remake_ComboBox,11,1,1,1);
+	//deductMark_Widget->show();
 }
 
 void RobotContest::signalsAndSlots()
@@ -485,9 +595,20 @@ void RobotContest::signalsAndSlots()
 	connect(verifyScore_PushButton, &QPushButton::clicked, this, &RobotContest::on_verifyScore_PushButton_clicked);
 	connect(startTime_PushButton, &QPushButton::clicked, this, &RobotContest::on_startTime_PushBtton_clicked);
 	connect(clearScore_PushButton, &QPushButton::clicked, this, &RobotContest::on_clearScore_PushButton_clicked);
+
+	connect(&saveTimer, &QTimer::timeout, this, &RobotContest::on_saveTimer_timeout);
 	connect(&timer, &QTimer::timeout, this, &RobotContest::on_update_timeOver);
 	connect(quit_PushButton, &QPushButton::clicked, this, &RobotContest::close);
 	connect(teamName_LineEdit, &QLineEdit::textChanged, this, &RobotContest::on_teamName_LineEdit_textChanged);
+	connect(writeDeductTime_PushButton, &QPushButton::clicked, this, &RobotContest::on_writeDeductTime_PushButton_clicked);
+	
+
+	//connect(deductMark_Widget, &QWidget::, this, &RobotContest::on_quitWidget_PushButton_clicked);
+	connect(calculate_PushButton, &QPushButton::clicked, this, &RobotContest::on_calculate_PushButton_clicked);
+	connect(quitWidget_PushButton, &QPushButton::clicked, this, &RobotContest::on_quitWidget_PushButton_clicked);
+	//connect(writeDeductTime_PushButton, &QPushButton::clicked, this, &RobotContest::on_writeDeductTime_PushButton_clicked)
+	
+
 }
 
 void RobotContest::init()

@@ -16,6 +16,7 @@ public:
 	bool openExcel(QString fileName);
 	bool newExcel(QString fileName);
 	void closeExcel();
+	void saveExcel();
 	const bool isOpened();
 	QString readCellValue(int row, int column);
 	QString readCellValue(int row, QString column);

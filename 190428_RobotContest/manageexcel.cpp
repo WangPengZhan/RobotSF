@@ -75,6 +75,13 @@ void ManageExcel::closeExcel()
 	}
 }
 
+void ManageExcel::saveExcel()
+{
+	if (isOpen) {
+		work_book->dynamicCall("Save()");
+	}
+}
+
 const bool ManageExcel::isOpened()
 {
 	return isOpen;

@@ -40,6 +40,10 @@ private slots:
 	void dealWithSerialPortDate(QByteArray data);
 	void on_update_timeOver();
 	void on_teamName_LineEdit_textChanged();
+	void on_saveTimer_timeout();
+	void on_writeDeductTime_PushButton_clicked();
+	void on_calculate_PushButton_clicked();
+	void on_quitWidget_PushButton_clicked();
 	
 
 private:
@@ -57,7 +61,7 @@ private:
 	SerialPort *mySerialPort;
 
 	int currentRow;
-	QTimer timer;
+	QTimer timer, saveTimer;
 	//QDateTime beginDateTime;
 	//QDateTime CurrentDateTime;
 	QTime beginTime;
@@ -73,7 +77,7 @@ private:
 	bool isOnce;
 	QString theResult;
 	
-	//
+	//主界面
 	QLabel *title_Label;
 	QLCDNumber *time_LCDNumber;
 
@@ -82,6 +86,7 @@ private:
 	QPushButton *openSerialPort_PushButton;
 	QPushButton *openExcel_PushButton;
 	QPushButton *newExcel_PushButton;
+	QPushButton *writeDeductTime_PushButton;
 	//QTextBrowser *tipsForteam_TextBrowser;
 	QLabel *tipsForTeams_Label;
 	
@@ -110,7 +115,7 @@ private:
 	QWidget *center;
 	QGridLayout *main_GridLayout;
 
-	//
+	//录入加罚时间界面
 	QWidget *deductMark_Widget;
 	QGridLayout *deductMark_GridLayout;
 	QLabel *teamNum1_Label;
@@ -126,11 +131,20 @@ private:
 	QLabel *interference_Label;
 	QLineEdit *interference_LineEdit;
 	QLabel *isStop_Label;
-	QLineEdit *isStop_LineEdit;
+	QComboBox *isStop_ComboBox;
+	//QLineEdit *isStop_LineEdit;
 	QLabel *isSlide_Label;
-	QLineEdit *isSlide_LineEdit;
+	QComboBox *isSlide_ComboBox;
+	//QLineEdit *isSlide_LineEdit;
 
-	QLabel *tipsForStaff_Label;
+	QPushButton *calculate_PushButton;
 	QPushButton *quitWidget_PushButton;
+	QLabel *totalDeductMarks_Label;
+	QLineEdit *totalDeductMarks_LineEdit;
+	QLabel *finalTime_Label;
+	QLineEdit *finalTime_LineEdit;
+	QLabel *remake_Label;
+	QComboBox *remake_ComboBox;
+	QTextBrowser *tipsForStaff_TextBrowser;
 	//Ui::RobotContestClass ui;
 };
