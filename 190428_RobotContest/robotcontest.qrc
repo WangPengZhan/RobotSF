@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="RobotContest">
+    <qresource prefix="/">
+        <file>bg.png</file>
+        <file>hh.png</file>
     </qresource>
 </RCC>
