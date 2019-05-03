@@ -30,6 +30,4 @@ private:
 	QAxObject *work_sheets;
 	QAxObject *work_sheet;
 	bool isOpen;
-
-
 };

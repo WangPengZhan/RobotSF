@@ -527,6 +527,7 @@ void RobotContest::createDeductMarkWidget()
 	isSlide_ComboBox = new QComboBox(this);
 	isSlide_ComboBox->addItem(tr("否"));
 	isSlide_ComboBox->addItem(tr("是"));
+	//isSlide_LineEdit = new QLineEdit(this);
 
 	calculate_PushButton = new QPushButton(tr("计算"), this);
 	quitWidget_PushButton = new QPushButton(tr("退出并保存录入"), this);
@@ -543,10 +544,6 @@ void RobotContest::createDeductMarkWidget()
 	remake_ComboBox = new QComboBox(this);
 	remake_ComboBox->addItem(tr("否"));
 	remake_ComboBox->addItem(tr("是"));
-
-	//isSlide_LineEdit = new QLineEdit(this);
-
-	
 
 	deductMark_Widget = new QWidget();
 	deductMark_Widget->setFont(QFont(tr("楷体"), 12));
@@ -602,13 +599,10 @@ void RobotContest::signalsAndSlots()
 	connect(teamName_LineEdit, &QLineEdit::textChanged, this, &RobotContest::on_teamName_LineEdit_textChanged);
 	connect(writeDeductTime_PushButton, &QPushButton::clicked, this, &RobotContest::on_writeDeductTime_PushButton_clicked);
 	
-
 	//connect(deductMark_Widget, &QWidget::, this, &RobotContest::on_quitWidget_PushButton_clicked);
 	connect(calculate_PushButton, &QPushButton::clicked, this, &RobotContest::on_calculate_PushButton_clicked);
 	connect(quitWidget_PushButton, &QPushButton::clicked, this, &RobotContest::on_quitWidget_PushButton_clicked);
-	//connect(writeDeductTime_PushButton, &QPushButton::clicked, this, &RobotContest::on_writeDeductTime_PushButton_clicked)
-	
-
+	//connect(writeDeductTime_PushButton, &QPushButton::clicked, this, &RobotContest::on_writeDeductTime_PushButton_clicked);
 }
 
 void RobotContest::init()
@@ -645,6 +639,7 @@ QString RobotContest::intToTimeString(int totalMescs)
 	if (totalMescs > 3600000) {
 		totalMescs = totalMescs - 3600000;
 	}
+
 	int t_mescs = totalMescs % 1000;
 	int t_sec = (totalMescs / 1000) % 60;
 	int t_minu = (totalMescs / 1000 / 60);

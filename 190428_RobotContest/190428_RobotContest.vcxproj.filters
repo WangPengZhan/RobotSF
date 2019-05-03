@@ -13,6 +13,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="choosemodedialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="finalswindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -44,6 +50,12 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="manageexcel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="choosemodedialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="finalswindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
