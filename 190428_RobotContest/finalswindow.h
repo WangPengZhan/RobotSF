@@ -9,6 +9,9 @@
 #include <QWidget>
 #include <QTimer>
 #include <QTime>
+#include <QSpinBox>
+#include <QMessageBox>
+#include "voicedeal.h"
 
 class FinalsWindow : public QMainWindow
 {
@@ -20,10 +23,12 @@ public:
 private slots:
 	void on_startTime_PushButton_clicked();
 	void on_clearTime_PushButton_clicked();
-	void on_verifyTime_PushBUtton_clickef();
+	void on_verifyTime_PushButton_clicked();
 	void on_timer_timeout();
+	void on_verify_PushButton_clicked();
 private:
 	void designUI();
+	void createVerifyTimeWidget();
 	void signalsAndSlots();
 	void init();
 	int timeStringToInt(QString timeString);
@@ -37,6 +42,7 @@ private:
 	int totalmsecs;
 	QString theResult;
 	QTimer timer;
+	bool isOnce;
 
 	QLabel *title_Label;
 	QLCDNumber *time_LCDNumber;
@@ -49,4 +55,11 @@ private:
 	QLabel *sign_Label;
 	QWidget *center_Widget;
 	QGridLayout *main_GridLayout;
+
+	int msecs, sec, minu;
+	QLabel *minu_Label, *sec_Label, *msecs_Label;
+	QSpinBox *minu_SpinBox, *sec_SpinBox, *msecs_SpinBox;
+	QPushButton *verify_PushButton;
+	QWidget *verifyTime_Widget;
+	QGridLayout *verifyTime_GridLayout;
 };

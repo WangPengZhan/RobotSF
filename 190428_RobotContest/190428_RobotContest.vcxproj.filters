@@ -19,6 +19,9 @@
     <ClCompile Include="finalswindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="voicedeal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -56,6 +59,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="finalswindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="voicedeal.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
