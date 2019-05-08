@@ -7,23 +7,33 @@ ManageExcel::ManageExcel()
 
 ManageExcel::~ManageExcel()
 {
+	delete work_sheet;
+	delete work_sheets;
+	delete work_book;
+	delete work_books;
+	delete excel;
 }
 
 bool ManageExcel::openExcel(const QString fileName)
 {
 	if (!fileName.isEmpty()) {
-		isOpen = true;
+		delete excel;
 		excel = new QAxObject(this);
 		excel->setControl("Excel.Application");                  //连接Excel控件
-		excel->dynamicCall("SetVisible(bool Visible", "false");   //不显示窗体
+		excel->dynamicCall("SetVisible(bool Visible", "true");   //不显示窗体
 		excel->setProperty("DisplayAlerts", false);              //不显示任何警告信息
 
+		delete work_books;
+		delete work_book;
 		work_books = excel->querySubObject("WorkBooks");         //获取工作簿集合
 		work_books->dynamicCall("Open(const QString&)", fileName);
 		work_book = excel->querySubObject("ActiveWorkBook");     //获取当前工作簿
 		if (work_book) {
+			delete work_sheets;
+			delete work_sheet;
 			work_sheets = work_book->querySubObject("WorkSheets"); //获取工作表集合
 			work_sheet = work_sheets->querySubObject("Item(int)", 1);//获取工作表1(Sheet1)
+			isOpen = true;
 			return true;
 		}
 		else {
@@ -40,20 +50,25 @@ bool ManageExcel::newExcel(const QString fileName)
 {
 	QFile file(fileName);
 	if(!file.exists()){
-		isOpen = true;
+		delete excel;
 		excel = new QAxObject(this);
 		excel->setControl("Excel.Application");
 		excel->dynamicCall("setVisible(bool Visible)", "true");
 		excel->setProperty("DisplayAlerts", false);
 
+		delete work_books;
+		delete work_book;
 		work_books = excel->querySubObject("WorkBooks");
 		work_books->dynamicCall("Add");
 		work_book = excel->querySubObject("ActiveWorkBook");
 		work_book->dynamicCall("SaveAs(const QString&)", QDir::toNativeSeparators(fileName));
 		if (work_book) {
+			delete work_sheets;
+			delete work_sheet;
 			work_sheets = work_book->querySubObject("WorkSheets"); 
 			work_sheet = work_sheets->querySubObject("Item(int)", 1);
 			//qDebug() << work_sheet->property("Name").toString();//Debug->获取当前工作表名称
+			isOpen = true;
 			return true;
 		}
 		else {

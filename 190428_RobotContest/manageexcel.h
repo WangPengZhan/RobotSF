@@ -24,10 +24,10 @@ public:
 	void writeCellValue(int row, QString colunm, const QString value);
 
 private:
-	QAxObject *excel;
-	QAxObject *work_books;
-	QAxObject *work_book;
-	QAxObject *work_sheets;
-	QAxObject *work_sheet;
+	QAxObject *excel = nullptr;
+	QAxObject *work_books = nullptr;
+	QAxObject *work_book = nullptr;
+	QAxObject *work_sheets = nullptr;
+	QAxObject *work_sheet = nullptr;
 	bool isOpen;
 };

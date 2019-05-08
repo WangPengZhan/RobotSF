@@ -19,6 +19,7 @@
 //#include "ui_robotcontest.h"
 #include "manageexcel.h"
 #include "serialport.h"
+#include "deduectmarkswidget.h"
 
 class RobotContest : public QMainWindow
 {
@@ -27,6 +28,7 @@ class RobotContest : public QMainWindow
 public:
 	RobotContest(QWidget *parent = Q_NULLPTR);
 	void closeEvent(QCloseEvent *event);
+
 private slots:
 	void on_searchSerialPort_PushButton_clicked();
 	void on_openSerialPort_PushButton_clicked();
@@ -42,21 +44,17 @@ private slots:
 	void on_teamName_LineEdit_textChanged();
 	void on_saveTimer_timeout();
 	void on_writeDeductTime_PushButton_clicked();
-	void on_calculate_PushButton_clicked();
-	void on_quitWidget_PushButton_clicked();
-	
+
 private:
 	void designUI();
-	void createDeductMarkWidget();
 	void signalsAndSlots();
 	void init();
 	int timeStringToInt(QString timeString);
 	QString intToTimeString(int totalMescs);
-	int facadeScoreToTime(QString score);
-
-
+	float facadeScoreToTime();
+	
 private:
-	ManageExcel manageExcel;
+	ManageExcel *manageExcel = nullptr;
 	SerialPort mySerialPort;
 
 	int currentRow;
@@ -74,7 +72,10 @@ private:
 	QTime waitEnd;
 	bool isClear;
 	bool isOnce;
+	bool isSecond;
 	QString theResult;
+
+	DeduectMarksWidget widget;
 	
 	//主界面
 	QLabel *title_Label;
@@ -110,40 +111,7 @@ private:
 	QPushButton *quit_PushButton;
 	
 	QLabel *sign_Label;
-
 	QWidget *center;
 	QGridLayout *main_GridLayout;
-
-	//录入加罚时间界面
-	QWidget *deductMark_Widget;
-	QGridLayout *deductMark_GridLayout;
-	QLabel *teamNum1_Label;
-	QLineEdit *teamNum1_LineEdit;
-	QLabel *teamName1_Label;
-	QLineEdit *teamName1_LineEdit;
-	QLabel *bend_Label;
-	QLineEdit *bend_LineEdit;
-	QLabel *obstacle_Label;
-	QLineEdit *obstacle_LineEdit;
-	QLabel *impact_Label;
-	QLineEdit *impact_LineEdit;
-	QLabel *interference_Label;
-	QLineEdit *interference_LineEdit;
-	QLabel *isStop_Label;
-	QComboBox *isStop_ComboBox;
-	//QLineEdit *isStop_LineEdit;
-	QLabel *isSlide_Label;
-	QComboBox *isSlide_ComboBox;
-	//QLineEdit *isSlide_LineEdit;
-
-	QPushButton *calculate_PushButton;
-	QPushButton *quitWidget_PushButton;
-	QLabel *totalDeductMarks_Label;
-	QLineEdit *totalDeductMarks_LineEdit;
-	QLabel *finalTime_Label;
-	QLineEdit *finalTime_LineEdit;
-	QLabel *remake_Label;
-	QComboBox *remake_ComboBox;
-	QTextBrowser *tipsForStaff_TextBrowser;
 	//Ui::RobotContestClass ui;
 };
