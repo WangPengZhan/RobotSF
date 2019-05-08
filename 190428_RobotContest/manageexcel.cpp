@@ -9,13 +9,13 @@ ManageExcel::~ManageExcel()
 {
 }
 
-bool ManageExcel::openExcel(QString fileName)
+bool ManageExcel::openExcel(const QString fileName)
 {
 	if (!fileName.isEmpty()) {
 		isOpen = true;
 		excel = new QAxObject(this);
 		excel->setControl("Excel.Application");                  //连接Excel控件
-		excel->dynamicCall("SetVisible(bool Visible", "true");   //不显示窗体
+		excel->dynamicCall("SetVisible(bool Visible", "false");   //不显示窗体
 		excel->setProperty("DisplayAlerts", false);              //不显示任何警告信息
 
 		work_books = excel->querySubObject("WorkBooks");         //获取工作簿集合
@@ -36,7 +36,7 @@ bool ManageExcel::openExcel(QString fileName)
 	}
 }
 
-bool ManageExcel::newExcel(QString fileName)
+bool ManageExcel::newExcel(const QString fileName)
 {
 	QFile file(fileName);
 	if(!file.exists()){
@@ -51,8 +51,8 @@ bool ManageExcel::newExcel(QString fileName)
 		work_book = excel->querySubObject("ActiveWorkBook");
 		work_book->dynamicCall("SaveAs(const QString&)", QDir::toNativeSeparators(fileName));
 		if (work_book) {
-			work_sheets = work_book->querySubObject("WorkSheets"); //获取工作表集合
-			work_sheet = work_sheets->querySubObject("Item(int)", 1);//获取工作表1(Sheet1)
+			work_sheets = work_book->querySubObject("WorkSheets"); 
+			work_sheet = work_sheets->querySubObject("Item(int)", 1);
 			//qDebug() << work_sheet->property("Name").toString();//Debug->获取当前工作表名称
 			return true;
 		}
@@ -87,14 +87,14 @@ const bool ManageExcel::isOpened()
 	return isOpen;
 }
 
-QString ManageExcel::readCellValue(int row, int column)
+const QString ManageExcel::readCellValue(int row, int column) 
 {
 	QAxObject *cell = work_sheet->querySubObject("Cells(int,int)", row, column);
 	QVariant cell_value = cell->dynamicCall("Value2()");
 	return cell_value.toString();
 }
 
-QString ManageExcel::readCellValue(int row, QString column)
+const QString ManageExcel::readCellValue(int row, QString column)
 {
 	QAxObject *cell = work_sheet->querySubObject("Range(QVariant,QVariant)", QString(column + tr("%1").arg(row)));
 	QVariant cell_value = cell->dynamicCall("Value2()");

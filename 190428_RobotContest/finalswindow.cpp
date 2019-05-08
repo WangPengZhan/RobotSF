@@ -9,8 +9,6 @@ FinalsWindow::FinalsWindow(QWidget *parent)
 	createVerifyTimeWidget();
 	signalsAndSlots();
 	init();
-	VoiceDeal a;
-	a.show();
 }
 
 FinalsWindow::~FinalsWindow()
@@ -20,20 +18,17 @@ FinalsWindow::~FinalsWindow()
 
 void FinalsWindow::on_startTime_PushButton_clicked()
 {
-	if (startTime_PushButton->text() == tr("开始倒计时")) {
-		startTime_PushButton->setText("继续");
-		beginTime = QTime::currentTime();
-		isOnce = false;
-	}
 	if (startTime_PushButton->text() == tr("暂停")) {
 		waitBegin = QTime::currentTime();
 		timer.stop();
 		startTime_PushButton->setText("继续");
+		isClear = false;
 	}
 	else {
-		if(isOnce){
-			waitEnd = QTime::currentTime();
-			isOnce = true;
+		waitEnd = QTime::currentTime();
+		if(isClear){
+			beginTime = QTime::currentTime();
+			waitBegin = waitEnd;
 		}
 		waitmsecs += waitBegin.msecsTo(waitEnd);
 		timer.start(7);
@@ -45,11 +40,13 @@ void FinalsWindow::on_clearTime_PushButton_clicked()
 {
 	totalmsecs = minu * 60 * 1000 + sec * 1000 + msecs;
 	time_LCDNumber->display(intToTimeString(totalmsecs));
-	beginTime = currentTime;
 	waitmsecs = 0;
 	waitBegin = waitEnd;
+	beginTime = QTime::currentTime();
+	isClear = true;
 	//startTime_PushButton->setText(tr("开始倒计时"));
 }
+
 
 void FinalsWindow::on_verifyTime_PushButton_clicked()
 {
@@ -107,7 +104,7 @@ void FinalsWindow::init()
 	waitmsecs = 0;
 	waitEnd = QTime::currentTime();
 	waitBegin = waitEnd;
-	isOnce = true;
+	isClear = true;
 }
 
 int FinalsWindow::timeStringToInt(QString timeString)
@@ -159,6 +156,7 @@ void FinalsWindow::designUI()
 	tipsForTeams_Label->setAlignment(Qt::AlignCenter);
 	startTime_PushButton = new QPushButton(tr("开始倒计时"), this);
 	startTime_PushButton->setStatusTip(tr("启动倒计时"));
+	startTime_PushButton->setCheckable(true);
 	clearTime_PushButton = new QPushButton(tr("清除"), this);
 	verifyTime_PushButton = new QPushButton(tr("设置时间"), this);
 	quit_PushButton = new QPushButton(tr("退出"), this);
@@ -209,5 +207,5 @@ void FinalsWindow::createVerifyTimeWidget()
 	verifyTime_Widget->setWindowTitle(tr("倒计时间设置"));
 	verifyTime_Widget->setWindowIcon(QIcon(":/bg.png"));
 	verifyTime_Widget->setFont(QFont(tr("楷体"), 16));
-	verifyTime_Widget->show();
+	//verifyTime_Widget->show();
 }

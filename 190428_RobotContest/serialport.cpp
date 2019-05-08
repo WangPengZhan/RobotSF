@@ -16,7 +16,7 @@ SerialPort::~SerialPort()
 
 bool SerialPort::openSerialPort(uint8_t serialPortNameIndex)
 {
-	serialPortName = serialPortNames.at(serialPortNameIndex);
+	/*serialPortName = serialPortNames.at(serialPortNameIndex);
 	serial.setPortName(serialPortName);
 	if (!serial.open(QIODevice::ReadWrite)) {
 		serial.close();
@@ -32,6 +32,15 @@ bool SerialPort::openSerialPort(uint8_t serialPortNameIndex)
 		isOpen = true;
 	}
 
+	return isOpen;*/
+	serialPortName = serialPortNames.at(serialPortNameIndex);
+	serial.setPortName(serialPortName);//设置串口号 
+	isOpen = serial.open(QIODevice::ReadWrite);//打开串口
+	if (isOpen)
+	{
+		connect(&serial, SIGNAL(readyRead()), this, SLOT(readAllDatas()));
+	}
+	else serial.close();
 	return isOpen;
 }
 
@@ -154,6 +163,7 @@ void SerialPort::setFlowControl(uint8_t flowControlIndex)
 
 const QStringList SerialPort::searchSerialPort() 
 {
+	serialPortNames.clear();
 	foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
 	{
 		serialPortNames << info.portName();

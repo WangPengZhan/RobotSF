@@ -13,13 +13,13 @@ class ManageExcel : public QObject
 public:
 	ManageExcel();
 	~ManageExcel();
-	bool openExcel(QString fileName);
-	bool newExcel(QString fileName);
+	bool openExcel(const QString fileName);
+	bool newExcel(const QString fileName);
 	void closeExcel();
 	void saveExcel();
 	const bool isOpened();
-	QString readCellValue(int row, int column);
-	QString readCellValue(int row, QString column);
+	const QString readCellValue(int row, int column);
+	const QString readCellValue(int row, QString column);
 	void writeCellValue(int row, int column, const QString value);
 	void writeCellValue(int row, QString colunm, const QString value);
 

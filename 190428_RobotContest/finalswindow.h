@@ -42,7 +42,7 @@ private:
 	int totalmsecs;
 	QString theResult;
 	QTimer timer;
-	bool isOnce;
+	bool isClear;
 
 	QLabel *title_Label;
 	QLCDNumber *time_LCDNumber;

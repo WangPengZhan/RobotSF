@@ -45,7 +45,6 @@ private slots:
 	void on_calculate_PushButton_clicked();
 	void on_quitWidget_PushButton_clicked();
 	
-
 private:
 	void designUI();
 	void createDeductMarkWidget();
@@ -58,7 +57,7 @@ private:
 
 private:
 	ManageExcel manageExcel;
-	SerialPort *mySerialPort;
+	SerialPort mySerialPort;
 
 	int currentRow;
 	QTimer timer, saveTimer;

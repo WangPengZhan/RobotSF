@@ -6,6 +6,7 @@ RobotContest::RobotContest(QWidget *parent)
 	: QMainWindow(parent)
 {
 	//ui.setupUi(this);
+	//mySerialPort = new SerialPort();
 	designUI();
 
 	createDeductMarkWidget();
@@ -23,23 +24,23 @@ void RobotContest::closeEvent(QCloseEvent * event)
 void RobotContest::on_openSerialPort_PushButton_clicked()
 {
 	if (openSerialPort_PushButton->text() == "打开串口") {
-		mySerialPort->setBaudRate(4);//9600
-		mySerialPort->setDataBits(0);//8
-		mySerialPort->setFlowControl(0);//none
-		mySerialPort->setStopBits(0);//1
-		mySerialPort->setParity(0);//none
-		if (mySerialPort->openSerialPort(serialPort_ComboBox->currentIndex())) {
+		mySerialPort.setBaudRate(4);//9600
+		mySerialPort.setDataBits(0);//8
+		mySerialPort.setFlowControl(0);//none
+		mySerialPort.setStopBits(0);//1
+		mySerialPort.setParity(0);//none
+		if (mySerialPort.openSerialPort(serialPort_ComboBox->currentIndex())) {
 			openSerialPort_PushButton->setText("关闭串口");
 
 		}
 		else {
 			QMessageBox::warning(this, tr("警告"), tr("串口打开失败！"), QMessageBox::Ok);
-			mySerialPort->closeSerialPort();
+			mySerialPort.closeSerialPort();
 		}
 	}
 	else {
-		mySerialPort->closeSerialPort();
-		openSerialPort_PushButton->setText(tr("关闭串口"));
+		mySerialPort.closeSerialPort();
+		openSerialPort_PushButton->setText(tr("打开串口"));
 	}
 }
 
@@ -59,6 +60,10 @@ void RobotContest::on_openExcel_PushButton_clicked()
 		facadeScore_LineEdit->setText(manageExcel.readCellValue(currentRow, 6));
 		lastOne_PushButton->setEnabled(true);
 		nextOne_PushButton->setEnabled(true);
+		startTime_PushButton->setEnabled(true);
+		clearScore_PushButton->setEnabled(true);
+		writeDeductTime_PushButton->setEnabled(true);
+		verifyScore_PushButton->setEnabled(true);
 	}
 	else {
 		statusBar()->showMessage(fileName + tr("打开失败！"), 5000);
@@ -233,10 +238,11 @@ void RobotContest::dealWithSerialPortDate(QByteArray data)
 		timer.stop();
 		isOnce = false;
 		if (manageExcel.readCellValue(currentRow, "C").isEmpty()) {
-			firstScore_LineEdit->setText(tr("%1:%2:%3").arg(minu, 2, 10, QChar('0')).arg(sec, 2, 10, QChar('0')).arg(msecs, 3, 10, QChar('0')));
+
+			firstScore_LineEdit->setText(intToTimeString(totalmsecs));
 		}
 		else if (manageExcel.readCellValue(currentRow, "D").isEmpty()) {
-			secondScore_LineEdit->setText(tr("%1:%2:%3").arg(minu, 2, 10, QChar('0')).arg(sec, 2, 10, QChar('0')).arg(msecs, 3, 10, QChar('0')));
+			secondScore_LineEdit->setText(intToTimeString(totalmsecs));
 		}
 		if (timeStringToInt(firstScore_LineEdit->text()) > timeStringToInt(secondScore_LineEdit->text())) {
 			finalScore_LineEdit->setText(secondScore_LineEdit->text());
@@ -302,7 +308,6 @@ void RobotContest::on_writeDeductTime_PushButton_clicked()
 	}
 	//isStop_LineEdit->setText(manageExcel.readCellValue(currentRow, 12));
 	//isSlide_LineEdit->setText(manageExcel.readCellValue(currentRow, 13));
-
 	deductMark_Widget->show();
 }
 
@@ -328,8 +333,9 @@ void RobotContest::on_calculate_PushButton_clicked()
 	}
 	isStop = isStop_ComboBox->currentIndex();
 	isSlide = isSlide_ComboBox->currentIndex();
-	totalDeductMarks = 5 * bendsConuts + 10 * obstaclesCounts + 5 * impactsCount + 5 * interferencesCount +
-		5 * isStop + 10 * isSlide;
+	//totalDeductMarks = 5 * bendsConuts + 10 * obstaclesCounts + 5 * impactsCount + 5 * interferencesCount +
+		//5 * isStop + 10 * isSlide;
+	totalDeductMarks = 10 * (isSlide + obstaclesCounts) + 5 * (impactsCount + interferencesCount + isStop +  bendsConuts); 
 	totalDeductMarks_LineEdit->setText(tr("%1").arg(totalDeductMarks));
 
 	if (!manageExcel.readCellValue(currentRow, 7).isEmpty()) {
@@ -345,7 +351,6 @@ void RobotContest::on_calculate_PushButton_clicked()
 
 void RobotContest::on_quitWidget_PushButton_clicked()
 {
-
 	manageExcel.writeCellValue(currentRow, 8, bend_LineEdit->text());
 	manageExcel.writeCellValue(currentRow, 9, obstacle_LineEdit->text());
 	manageExcel.writeCellValue(currentRow, 10, impact_LineEdit->text());
@@ -355,7 +360,7 @@ void RobotContest::on_quitWidget_PushButton_clicked()
 	manageExcel.writeCellValue(currentRow, 14, totalDeductMarks_LineEdit->text());
 	manageExcel.writeCellValue(currentRow, 15, finalTime_LineEdit->text());
 	manageExcel.writeCellValue(currentRow, 16, tr("%1").arg(remake_ComboBox->currentIndex()));
-
+	deductMark_Widget->close();
 }
 
 void RobotContest::designUI()
@@ -374,9 +379,10 @@ void RobotContest::designUI()
 
 	//palette.setColor(QPalette::Background, QColor(255, 255, 255));
 	time_LCDNumber = new QLCDNumber(this);
+	time_LCDNumber->setMinimumHeight(100);
 	time_LCDNumber->setDigitCount(9);
 	time_LCDNumber->display(tr("00:00:000"));
-	time_LCDNumber->setFont(QFont(tr(""),48));
+	time_LCDNumber->setFont(QFont(tr("楷体"),48));
 	//time_LCDNumber->setPalette(palette);
 
 	serialPort_ComboBox = new QComboBox(this);
@@ -384,12 +390,14 @@ void RobotContest::designUI()
 	searchSerialPort_PushButton->setStatusTip(tr("搜索系统串口"));
 	openSerialPort_PushButton = new QPushButton(tr("打开串口"), this);
 	openSerialPort_PushButton->setStatusTip(tr("打开当前串口"));
+	openSerialPort_PushButton->setCheckable(true);
 	openSerialPort_PushButton->setEnabled(false);
 	openExcel_PushButton = new QPushButton(tr("加载文件"), this);
 	openExcel_PushButton->setStatusTip(tr("加载比赛的Excel文件"));
 	newExcel_PushButton = new QPushButton(tr("新建Excel"), this);
 	newExcel_PushButton->setStatusTip(tr("新建一个Excel文件"));
 	writeDeductTime_PushButton = new QPushButton(tr("录入加罚成绩"), this);
+	writeDeductTime_PushButton->setEnabled(false);
 	//writeDeductTime_PushButton->setEnabled(false);
 
 	//tipsForteam_TextBrowser = new QTextBrowser(this);
@@ -398,7 +406,7 @@ void RobotContest::designUI()
 	//tipsForteam_TextBrowser->setFont(QFont("楷体",48));
 
 	tipsForTeams_Label = new QLabel(this);
-	tipsForTeams_Label->setText(tr("某某队正在比赛\n请某某队做好准备！"));
+	tipsForTeams_Label->setText(tr("机器人协会\n欢迎您！"));
 	tipsForTeams_Label->setFont(QFont("楷体", 48));
 	tipsForTeams_Label->setAlignment(Qt::AlignCenter);
 
@@ -437,13 +445,14 @@ void RobotContest::designUI()
 	nextOne_PushButton->setEnabled(false);
 	verifyScore_PushButton = new QPushButton(tr("写入成绩"), this);
 	verifyScore_PushButton->setStatusTip(tr("写入现有成绩"));
-	//verifyScore_PushButton->setEnabled(false);
+	verifyScore_PushButton->setEnabled(false);
 	startTime_PushButton = new QPushButton(tr("开始计时"), this);
 	startTime_PushButton->setStatusTip(tr("启动计时器计时"));
-	//startTime_PushButton->setEnabled(false);
+	startTime_PushButton->setEnabled(false);
+	startTime_PushButton->setCheckable(true);
 	clearScore_PushButton = new QPushButton(tr("清除"), this);
 	clearScore_PushButton->setStatusTip(tr("清除复位，开始下一次计时"));
-	//clearScore_PushButton->setEnabled(false);
+	clearScore_PushButton->setEnabled(false);
 	quit_PushButton = new QPushButton(tr("退出"), this);
 	sign_Label = new QLabel(tr("WUST 机器人协会"), this);
 	sign_Label->setAlignment(Qt::AlignRight);
@@ -454,8 +463,9 @@ void RobotContest::designUI()
 	center->setAutoFillBackground(true);
 	
 	QPalette palette;
-	palette.setColor(QPalette::Background, QColor(192, 253, 123));
-	//palette.setBrush(QPalette::Background, QBrush(QPixmap(":/bg.png")));
+	palette.setColor(QPalette::Background, QColor(180, 193, 255));
+	
+	palette.setBrush(QPalette::Background, QBrush(QPixmap(":/bg.png")));
 	center->setPalette(palette);
 	//center->setStyleSheet("border-image: \*url();");
 	setCentralWidget(center);
@@ -521,6 +531,7 @@ void RobotContest::createDeductMarkWidget()
 	isStop_ComboBox = new QComboBox(this);
 	isStop_ComboBox->addItem(tr("是"),0);
 	isStop_ComboBox->addItem(tr("否"), 1);
+	isStop_ComboBox->setCurrentIndex(1);
 	//isStop_LineEdit = new QLineEdit(this);
 	isSlide_Label = new QLabel(tr("是否下滑"), this);
 	isSlide_Label->setAlignment(Qt::AlignCenter);
@@ -583,7 +594,8 @@ void RobotContest::createDeductMarkWidget()
 
 void RobotContest::signalsAndSlots()
 {
-	connect(searchSerialPort_PushButton,&QPushButton::clicked, this,&RobotContest::on_searchSerialPort_PushButton_clicked);
+	connect(searchSerialPort_PushButton, &QPushButton::clicked, this, &RobotContest::on_searchSerialPort_PushButton_clicked);
+	connect(&mySerialPort, &SerialPort::serialPassData, this, &RobotContest::dealWithSerialPortDate);
 	connect(openExcel_PushButton, &QPushButton::clicked, this, &RobotContest::on_openExcel_PushButton_clicked);
 	connect(openSerialPort_PushButton, &QPushButton::clicked, this, &RobotContest::on_openSerialPort_PushButton_clicked);
 	connect(newExcel_PushButton, &QPushButton::clicked, this, &RobotContest::on_newExcel_PushButton_clicked);
@@ -598,22 +610,20 @@ void RobotContest::signalsAndSlots()
 	connect(quit_PushButton, &QPushButton::clicked, this, &RobotContest::close);
 	connect(teamName_LineEdit, &QLineEdit::textChanged, this, &RobotContest::on_teamName_LineEdit_textChanged);
 	connect(writeDeductTime_PushButton, &QPushButton::clicked, this, &RobotContest::on_writeDeductTime_PushButton_clicked);
-	
-	//connect(deductMark_Widget, &QWidget::, this, &RobotContest::on_quitWidget_PushButton_clicked);
+
 	connect(calculate_PushButton, &QPushButton::clicked, this, &RobotContest::on_calculate_PushButton_clicked);
 	connect(quitWidget_PushButton, &QPushButton::clicked, this, &RobotContest::on_quitWidget_PushButton_clicked);
-	//connect(writeDeductTime_PushButton, &QPushButton::clicked, this, &RobotContest::on_writeDeductTime_PushButton_clicked);
 }
 
 void RobotContest::init()
 {
 	currentRow = 2;
-	mySerialPort = new SerialPort();
+	//mySerialPort = new SerialPort();
 	msecs = 0;
 	sec = 0;
 	minu = 0;
 	totalmsecs = 0;
-	isClear = false;
+	isClear = true;
 	isOnce = false;
 	//beginDateTime = QDateTime::currentDateTime();
 }
@@ -656,7 +666,7 @@ int RobotContest::facadeScoreToTime(QString score)
 void RobotContest::on_searchSerialPort_PushButton_clicked()
 {
 	serialPort_ComboBox->clear();
-	serialPort_ComboBox->addItems(mySerialPort->searchSerialPort());
+	serialPort_ComboBox->addItems(mySerialPort.searchSerialPort());
 	if (serialPort_ComboBox->currentText() != tr("没有串口，请重新连接串口！")) {
 		openSerialPort_PushButton->setEnabled(true);
 	}

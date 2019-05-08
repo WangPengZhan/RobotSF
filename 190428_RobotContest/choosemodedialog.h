@@ -28,7 +28,7 @@ private slots:
 private:
 	QRadioButton  *preliminaryContest_RidioButton, *finals_RadioButton;
 	QPushButton *verify_PushButton;
-	QLabel *version_Label;
+	//QLabel *version_Label;
 	QGridLayout *main_GridLayout;
 
 	int mode;
