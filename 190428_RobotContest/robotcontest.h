@@ -27,6 +27,7 @@ class RobotContest : public QMainWindow
 
 public:
 	RobotContest(QWidget *parent = Q_NULLPTR);
+	~RobotContest();
 	void closeEvent(QCloseEvent *event);
 
 private slots:
@@ -49,6 +50,7 @@ private:
 	void designUI();
 	void signalsAndSlots();
 	void init();
+	void loadQSSFile(const QString style);
 	int timeStringToInt(QString timeString);
 	QString intToTimeString(int totalMescs);
 	float facadeScoreToTime();

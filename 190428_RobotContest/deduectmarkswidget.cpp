@@ -39,14 +39,21 @@ void DeduectMarksWidget::closeEvent()
 
 void DeduectMarksWidget::on_quitWidget_PushButton_clicked()
 {
-	manageExcel->writeCellValue(currentRow, 8, bend_LineEdit->text());
-	manageExcel->writeCellValue(currentRow, 9, obstacle_LineEdit->text());
-	manageExcel->writeCellValue(currentRow, 10, impact_LineEdit->text());
-	manageExcel->writeCellValue(currentRow, 11, interference_LineEdit->text());
-	manageExcel->writeCellValue(currentRow, 12, tr("%1").arg(isStop_ComboBox->currentIndex()));
-	manageExcel->writeCellValue(currentRow, 13, tr("%1").arg(isSlide_ComboBox->currentIndex()));
-	manageExcel->writeCellValue(currentRow, 14, totalDeductMarks_LineEdit->text());
-	manageExcel->writeCellValue(currentRow, 4, finalTime_LineEdit->text());
+	manageExcel->writeCellValue(currentRow + isSecond, 8, bend_LineEdit->text());
+	manageExcel->writeCellValue(currentRow + isSecond, 9, obstacle_LineEdit->text());
+	manageExcel->writeCellValue(currentRow + isSecond, 10, impact_LineEdit->text());
+	manageExcel->writeCellValue(currentRow + isSecond, 11, interference_LineEdit->text());
+	manageExcel->writeCellValue(currentRow + isSecond, 12, tr("%1").arg(isStop_ComboBox->currentIndex()));
+	manageExcel->writeCellValue(currentRow + isSecond, 13, tr("%1").arg(isSlide_ComboBox->currentIndex()));
+	manageExcel->writeCellValue(currentRow + isSecond, 14, totalDeductMarks_LineEdit->text());
+	manageExcel->writeCellValue(currentRow + isSecond, 4, finalTime_LineEdit->text());
+	if (timeStringToInt(manageExcel->readCellValue(currentRow, 4)) > 
+		timeStringToInt(manageExcel->readCellValue(currentRow + isSecond, 4))) {
+		manageExcel->writeCellValue(currentRow, 15, manageExcel->readCellValue(currentRow + 1, 4));
+	}
+	else {
+		manageExcel->writeCellValue(currentRow, 15, manageExcel->readCellValue(currentRow, 4));
+	}
 	//manageExcel->writeCellValue(currentRow, 16, tr("%1").arg(remake_ComboBox->currentIndex()));
 	close();
 }
@@ -106,6 +113,7 @@ void DeduectMarksWidget::designUI()
 	setWindowTitle(tr("加罚时间录入"));
 	setFont(QFont("楷体", 16));
 	setWindowIcon(QIcon(":/bg.png"));
+	setWindowModality(Qt::ApplicationModal);
 
 	teamNum1_Label = new QLabel(tr("参赛序号"), this);
 	teamNum1_Label->setAlignment(Qt::AlignCenter);

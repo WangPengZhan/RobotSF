@@ -20,7 +20,7 @@ bool ManageExcel::openExcel(const QString fileName)
 		delete excel;
 		excel = new QAxObject(this);
 		excel->setControl("Excel.Application");                  //连接Excel控件
-		excel->dynamicCall("SetVisible(bool Visible", "true");   //不显示窗体
+		excel->dynamicCall("SetVisible(bool Visible", "false");   //不显示窗体
 		excel->setProperty("DisplayAlerts", false);              //不显示任何警告信息
 
 		delete work_books;
@@ -53,7 +53,7 @@ bool ManageExcel::newExcel(const QString fileName)
 		delete excel;
 		excel = new QAxObject(this);
 		excel->setControl("Excel.Application");
-		excel->dynamicCall("setVisible(bool Visible)", "true");
+		excel->dynamicCall("setVisible(bool Visible)", "false");
 		excel->setProperty("DisplayAlerts", false);
 
 		delete work_books;

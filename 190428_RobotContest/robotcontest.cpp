@@ -12,6 +12,14 @@ RobotContest::RobotContest(QWidget *parent)
 	signalsAndSlots();
 
 	init();
+
+	loadQSSFile(":/style.qss");
+}
+
+RobotContest::~RobotContest()
+{
+	delete manageExcel;
+	delete center;
 }
 
 void RobotContest::closeEvent(QCloseEvent * event)
@@ -200,20 +208,13 @@ void RobotContest::on_update_timeOver()
 	CurrentTime = QTime::currentTime();
 	totalmsecs = beginTime.msecsTo(CurrentTime);
 	totalmsecs -= waitmsecs;
-	if (totalmsecs > 3600000) {
-		totalmsecs = totalmsecs - 3600000;
-	}
-	int t_mescs = totalmsecs % 1000;
-	int t_sec = (totalmsecs / 1000) % 60;
-	int t_minu = (totalmsecs / (1000 * 60));
-
-	theResult = tr("%1:%2:%3").arg(t_minu, 2, 10, QChar('0')).arg(t_sec, 2, 10, QChar('0')).arg(t_mescs, 3, 10, QChar('0'));
+	theResult = intToTimeString(totalmsecs);
 	time_LCDNumber->display(theResult);
 }
 
 void RobotContest::on_teamName_LineEdit_textChanged()
 {
-	QString nextTeamName = manageExcel->readCellValue(currentRow + 1, "B");
+	QString nextTeamName = manageExcel->readCellValue(currentRow + 2, "B");
 	if (!nextTeamName.isEmpty()) {
 		tipsForTeams_Label->setText(tr("%1正在比赛\n请%2做好准备！").arg(teamName_LineEdit->text()).arg(nextTeamName));
 	}
@@ -239,9 +240,9 @@ void RobotContest::designUI()
 	setWindowTitle(tr("武汉科技大学 第五届机器人大赛"));
 	setFont(QFont(tr("楷体"), 12));
 	setWindowIcon(QIcon(":/hh.png"));
-	//setStyleSheet("border-image:url(:/bg.png)");
-	//QPalette palette;
-	//palette.setColor(QPalette::Background,QColor(255, 255, 255));
+	QPalette palette;
+	palette.setColor(QPalette::Background,QColor(153, 178, 255));
+	setPalette(palette);
 	title_Label = new QLabel(tr("武汉科技大学\n第五届机器人大赛"), this);
 	title_Label->setAlignment(Qt::AlignCenter);
 	title_Label->setFont(QFont("楷体",56));
@@ -286,7 +287,7 @@ void RobotContest::designUI()
 	teamNum_LineEdit = new QLineEdit(this);
 	teamNum_LineEdit->setAlignment(Qt::AlignCenter);
 	teamNum_LineEdit->setEnabled(false);
-	teamName_Label = new QLabel(tr("队长姓名"), this);
+	teamName_Label = new QLabel(tr("队伍名称"), this);
 	teamName_Label->setAlignment(Qt::AlignCenter);
 	teamName_LineEdit = new QLineEdit(this);
 	teamName_LineEdit->setAlignment(Qt::AlignCenter);
@@ -332,11 +333,7 @@ void RobotContest::designUI()
 
 	center = new QWidget(this);
 	center->setAutoFillBackground(true);
-	
-	QPalette palette;
-	palette.setColor(QPalette::Background, QColor(180, 193, 255));
-	
-	palette.setBrush(QPalette::Background, QBrush(QPixmap(":/bg.png")));
+	//palette.setBrush(QPalette::Background, QBrush(QPixmap(":/bg.png")));
 	center->setPalette(palette);
 	//center->setStyleSheet("border-image: \*url();");
 	setCentralWidget(center);
@@ -406,6 +403,14 @@ void RobotContest::init()
 	isOnce = false;
 	isSecond = false;
 	//beginDateTime = QDateTime::currentDateTime();
+}
+
+void RobotContest::loadQSSFile(const QString style)
+{
+	QFile qss(style);
+	qss.open(QIODevice::ReadOnly);
+	setStyleSheet(qss.readAll());
+	qss.close();
 }
 
 int RobotContest::timeStringToInt(QString timeString)
