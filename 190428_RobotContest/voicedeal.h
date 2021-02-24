@@ -22,7 +22,7 @@ public:
 	VoiceDeal(QWidget *parent = nullptr);
 	~VoiceDeal();
 	void speak();
-	void speak(QString voiceText);
+	void speak(QString& voiceText);
 	void stop();
 	void setRate(int rate);
 	void setPitch(int pitch);

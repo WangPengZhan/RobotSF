@@ -21,7 +21,7 @@ private:
 	void designUI();
 	void SignalsAndSlots();
 	void init();
-	void loadQSSFile(const QString style);
+	void loadQSSFile(const QString& style);
 
 private slots:
 	void on_verify_PushButton_clicked();

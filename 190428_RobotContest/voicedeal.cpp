@@ -19,7 +19,7 @@ void VoiceDeal::speak()
 	speech->say(voiceText_PlainTextEdit->toPlainText());
 }
 
-void VoiceDeal::speak(QString voiceText)
+void VoiceDeal::speak(QString& voiceText)
 {
 	speech->say(voiceText);
 }

@@ -52,7 +52,7 @@ void ChooseModeDialog::init()
 	loadQSSFile(":/style");
 }
 
-void ChooseModeDialog::loadQSSFile(const QString style)
+void ChooseModeDialog::loadQSSFile(const QString& style)
 {
 	QFile qss(style);
 	qss.open(QIODevice::ReadOnly);
@@ -72,10 +72,10 @@ void ChooseModeDialog::on_verify_PushButton_clicked()
 	switch (mode)
 	{
 	case 0x00:
-		modeName = "初赛";
+		modeName = tr("初赛");
 		break;
 	case 0x10:
-		modeName = "决赛";
+		modeName = tr("决赛");
 		break;
 	default:
 		QMessageBox::warning(this, tr("警告"), tr("你的选择未完成！"), QMessageBox::Ok);
